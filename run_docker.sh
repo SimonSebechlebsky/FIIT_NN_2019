@@ -1,0 +1,1 @@
+docker run -v $(PWD):/tf/notebooks -p 8888:8888 -p 6006:6006 nn/gpu_image
