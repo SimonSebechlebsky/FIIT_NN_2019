@@ -3,6 +3,8 @@ import requests
 import shutil
 import logging
 import scipy.io as sio
+import cv2
+from xml.dom import minidom
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
@@ -57,9 +59,23 @@ def ensure_existing_data_folder(path):
         os.makedirs(folder_path)
 
 
+def crop_image(annotation_file, src):
+    dom = minidom.parse(annotation_file)
+    object_tag = dom.getElementsByTagName('object')
+    bndbox_tag = object_tag[0].getElementsByTagName('bndbox')
+    xmin = int(bndbox_tag[0].getElementsByTagName('xmin')[0].firstChild.nodeValue)
+    ymin = int(bndbox_tag[0].getElementsByTagName('ymin')[0].firstChild.nodeValue)
+    xmax = int(bndbox_tag[0].getElementsByTagName('xmax')[0].firstChild.nodeValue)
+    ymax = int(bndbox_tag[0].getElementsByTagName('ymax')[0].firstChild.nodeValue)
+    img = cv2.imread(src)
+    cropped_img = img[ymin:ymax, xmin:xmax]
+    return cropped_img
+
+
 def create_data_subset(image_list, destination_folder):
     logger.info(f'Creating {destination_folder} subset...')
     images_folder = prefix_with_data_folder('Images')
+    annotations_folder = prefix_with_data_folder('Annotation')
     ensure_existing_data_folder(destination_folder)
     for image_path in image_list['file_list']:
         path_str = image_path[0][0]
@@ -67,7 +83,11 @@ def create_data_subset(image_list, destination_folder):
         dst = os.path.join(prefix_with_data_folder(destination_folder), path_str)
         class_folder = path_str.split('/')[0]
         ensure_existing_data_folder(os.path.join(destination_folder, class_folder))
-        shutil.copyfile(src, dst)
+        annotation_str = path_str.split('.')[0]
+        annotation_file = os.path.join(annotations_folder, annotation_str)
+        cropped_img = crop_image(annotation_file, src)
+        cv2.imwrite(dst, cropped_img)
+        # shutil.copyfile(src, dst)
 
 
 def get_split_data_lists():
