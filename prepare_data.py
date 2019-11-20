@@ -1,0 +1,3 @@
+from data_manipulation import download_and_prepare_data
+
+download_and_prepare_data()

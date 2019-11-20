@@ -1,3 +1,4 @@
 .idea
 .ipynb_checkpoints
+**/__pycache__/**
 dog_breeds_data
