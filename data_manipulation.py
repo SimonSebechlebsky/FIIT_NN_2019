@@ -96,8 +96,8 @@ def get_split_data_lists():
 
 
 def download_and_prepare_data():
-    # download_data()
-    # extract_data()
+    download_data()
+    extract_data()
     train_list, test_list = get_split_data_lists()
     create_data_subset(train_list, 'train')
     create_data_subset(test_list, 'test')

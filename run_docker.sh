@@ -1,1 +1,1 @@
-docker run -u $(id -u):$(id -g) -v $(PWD):/tf/notebooks -p 8888:8888 -p 6006:6006 nn/gpu_image
+docker run -u $(id -u):$(id -g) -v $(PWD):/tf/notebooks -p 8888:8888 -d -p 6006:6006 nn/gpu_image
