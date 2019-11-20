@@ -59,8 +59,8 @@ def ensure_existing_data_folder(path):
         os.makedirs(folder_path)
 
 
-def crop_image(annotation_file, src):
-    dom = minidom.parse(annotation_file)
+def crop_image(annotation_path, src):
+    dom = minidom.parse(annotation_path)
     object_tag = dom.getElementsByTagName('object')
     bndbox_tag = object_tag[0].getElementsByTagName('bndbox')
     xmin = int(bndbox_tag[0].getElementsByTagName('xmin')[0].firstChild.nodeValue)
@@ -84,10 +84,9 @@ def create_data_subset(image_list, destination_folder):
         class_folder = path_str.split('/')[0]
         ensure_existing_data_folder(os.path.join(destination_folder, class_folder))
         annotation_str = path_str.split('.')[0]
-        annotation_file = os.path.join(annotations_folder, annotation_str)
-        cropped_img = crop_image(annotation_file, src)
+        annotation_path = os.path.join(annotations_folder, annotation_str)
+        cropped_img = crop_image(annotation_path, src)
         cv2.imwrite(dst, cropped_img)
-        # shutil.copyfile(src, dst)
 
 
 def get_split_data_lists():
@@ -97,8 +96,8 @@ def get_split_data_lists():
 
 
 def download_and_prepare_data():
-    download_data()
-    extract_data()
+    # download_data()
+    # extract_data()
     train_list, test_list = get_split_data_lists()
     create_data_subset(train_list, 'train')
     create_data_subset(test_list, 'test')

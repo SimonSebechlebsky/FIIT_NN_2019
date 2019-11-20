@@ -1,3 +1,5 @@
 scikit-image==0.16.2
 requests
 scipy
+opencv-python
+wordcloud
