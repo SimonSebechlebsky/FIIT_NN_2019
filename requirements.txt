@@ -3,3 +3,5 @@ requests
 scipy
 opencv-python
 wordcloud
+pandas
+python-resize-image
