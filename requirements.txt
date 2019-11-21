@@ -5,3 +5,4 @@ opencv-python
 wordcloud
 pandas
 python-resize-image
+pyyml

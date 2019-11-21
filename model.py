@@ -1,9 +1,18 @@
+import os
+
 import tensorflow.keras as keras
 from tensorflow.keras.layers import concatenate, Conv2D, Dense, Flatten, Layer, MaxPooling2D
+from tensorflow.keras import Sequential
+
+from data_manipulation import ROOT_DIR
+
+CLASS_COUNT = 120
 
 class Inception(Layer):
     def __init__(self, filters, activation):
         super(Inception, self).__init__()
+        self.filters = filters
+        self.activation = activation
 
         self.conv1 = Conv2D(
             filters=filters,
@@ -48,34 +57,25 @@ class Inception(Layer):
         filter_concatenation = concatenate([c3, c4, c5, c6])
         return filter_concatenation
 
+    def get_config(self):
+        return {
+            'filters': self.filters,
+            'activations': self.activation
+        }
 
-class InceptionSimpleModel(keras.Model):
 
-    def __init__(self, filters, dim_output):
-        super(InceptionSimpleModel, self).__init__()
-        self.model_layers = [
-            Inception(
-                filters=filters,
-                activation='relu'),
-            MaxPooling2D(pool_size=(2, 2)),
-            Inception(
-                filters=filters,
-                activation='relu'),
-            MaxPooling2D(pool_size=(2, 2)),
-            Inception(
-                filters=filters,
-                activation='relu'),
-            MaxPooling2D(pool_size=(2, 2)),
-            Flatten(),
-            Dense(
-                units=512,
-                activation='relu'),
-            Dense(
-                units=dim_output,
-                activation='softmax')
-        ]
+def get_model():
+    model = Sequential()
+    model.add(Inception(32, activation='relu'))
+    model.add(MaxPooling2D(pool_size=(7, 7)))
+    model.add(Inception(64, activation='relu'))
+    model.add(MaxPooling2D(pool_size=(5, 5)))
+    model.add(Inception(128, activation='relu'))
+    model.add(MaxPooling2D(pool_size=(3, 3)))
+    model.add(Flatten())
+    model.add(Dense(512, activation='relu'))
+    model.add(Dense(CLASS_COUNT, activation='softmax'))
+    return model
 
-    def call(self, x):
-        for layer in self.model_layers:
-            x = layer(x)
-        return x
+
+model = get_model()

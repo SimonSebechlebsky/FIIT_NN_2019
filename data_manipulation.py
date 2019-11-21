@@ -1,17 +1,18 @@
 import os
 import requests
 import shutil
-import logging
 import scipy.io as sio
 import cv2
 import skimage.io
 from xml.dom import minidom
+from tensorflow import keras
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger()
+from utils import logger, ROOT_DIR
 
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 DATA_DIR = os.path.join(ROOT_DIR, 'dog_breeds_data')
+
+IMAGE_DIM = 400
 
 
 # https://stackoverflow.com/questions/16694907/download-large-file-in-python-with-requests
@@ -122,6 +123,24 @@ def get_split_data_lists():
     train_list = sio.loadmat(prefix_with_data_folder('Lists/train_list.mat'))
     test_list = sio.loadmat(prefix_with_data_folder('Lists/test_list.mat'))
     return train_list, test_list
+
+
+def get_image_generators(config):
+    train_datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255)
+    train_generator = train_datagen.flow_from_directory(
+        os.path.join(DATA_DIR, 'train'),
+        class_mode='categorical',
+        batch_size=config['batch_size'],
+        target_size=(IMAGE_DIM, IMAGE_DIM),
+        )
+    test_datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255)
+    test_generator = test_datagen.flow_from_directory(
+        os.path.join(DATA_DIR, 'test'),
+        class_mode='categorical',
+        batch_size=config['batch_size'],
+        target_size=(IMAGE_DIM, IMAGE_DIM),
+        )
+    return train_generator, test_generator
 
 
 def download_and_prepare_data():
