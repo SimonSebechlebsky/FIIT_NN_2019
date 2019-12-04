@@ -23,11 +23,8 @@ class Conv2DBatchNorm(Layer):
         return x
 
     def get_config(self):
-        conv_config = self.conv.get_config()
-        return {
-            **conv_config,
-            'activation': self.activation
-        }
+        return self.conv.get_config()
+
 
 
 class Inception(Layer):
