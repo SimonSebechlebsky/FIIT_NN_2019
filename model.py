@@ -13,16 +13,13 @@ CLASS_COUNT = 120
 
 class Conv2DBatchNorm(Layer):
     def __init__(self, *args, **kwargs):
-        self.activation = kwargs.pop('activation', 'relu')
         super(Conv2DBatchNorm, self).__init__()
         self.conv = Conv2D(*args, **kwargs)
         self.batch = BatchNormalization()
-        self.act = Activation(self.activation)
 
     def call(self, x):
         x = self.conv(x)
         x = self.batch(x)
-        x = self.act(x)
         return x
 
     def get_config(self):
