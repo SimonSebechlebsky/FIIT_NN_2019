@@ -79,7 +79,7 @@ class Inception(Layer):
     def get_config(self):
         return {
             'filters': self.filters,
-            'activations': self.activation
+            'activation': self.activation
         }
 
 

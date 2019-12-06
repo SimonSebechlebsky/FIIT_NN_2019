@@ -140,8 +140,13 @@ def get_split_data_lists():
 def get_image_generators(config):
     train_datagen = keras.preprocessing.image.ImageDataGenerator(rescale=1. / 255,
                                                                  horizontal_flip=True,
-                                                                 rotation_range=20,
-                                                                 shear_range=10)
+                                                                 rotation_range=30,
+                                                                 shear_range=10,
+                                                                 width_shift_range=0.15,
+                                                                 height_shift_range=0.15,
+                                                                 zoom_range=0.2,
+                                                                 channel_shift_range=0.2
+                                                                 )
     train_generator = train_datagen.flow_from_directory(
         os.path.join(DATA_DIR, 'train'),
         class_mode='categorical',
