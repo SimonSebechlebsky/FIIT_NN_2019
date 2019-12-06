@@ -1,12 +1,31 @@
 import os
 
 import tensorflow.keras as keras
-from tensorflow.keras.layers import concatenate, Conv2D, Dense, Flatten, Layer, MaxPooling2D
+from tensorflow.keras.layers import concatenate, Conv2D, Dense, Flatten, Layer, MaxPooling2D, BatchNormalization, Activation
 from tensorflow.keras import Sequential
+
+from utils import logger
 
 from data_manipulation import ROOT_DIR
 
 CLASS_COUNT = 120
+
+
+class Conv2DBatchNorm(Layer):
+    def __init__(self, *args, **kwargs):
+        super(Conv2DBatchNorm, self).__init__()
+        self.conv = Conv2D(*args, **kwargs)
+        self.batch = BatchNormalization()
+
+    def call(self, x):
+        x = self.conv(x)
+        x = self.batch(x)
+        return x
+
+    def get_config(self):
+        return self.conv.get_config()
+
+
 
 class Inception(Layer):
     def __init__(self, filters, activation):
@@ -14,32 +33,32 @@ class Inception(Layer):
         self.filters = filters
         self.activation = activation
 
-        self.conv1 = Conv2D(
+        self.conv1 = Conv2DBatchNorm(
             filters=filters,
             kernel_size=1,
             padding='same',
             activation=activation)
-        self.conv2 = Conv2D(
+        self.conv2 = Conv2DBatchNorm(
             filters=filters,
             kernel_size=1,
             padding='same',
             activation=activation)
-        self.conv3 = Conv2D(
+        self.conv3 = Conv2DBatchNorm(
             filters=filters,
             kernel_size=1,
             padding='same',
             activation=activation)
-        self.conv4 = Conv2D(
+        self.conv4 = Conv2DBatchNorm(
             filters=filters,
             kernel_size=1,
             padding='same',
             activation=activation)
-        self.conv5 = Conv2D(
+        self.conv5 = Conv2DBatchNorm(
             filters=filters,
             kernel_size=3,
             padding='same',
             activation=activation)
-        self.conv6 = Conv2D(
+        self.conv6 = Conv2DBatchNorm(
             filters=filters,
             kernel_size=5,
             padding='same',
