@@ -4,6 +4,7 @@ import shutil
 import scipy.io as sio
 import cv2
 import skimage.io
+import random
 from xml.dom import minidom
 from tensorflow import keras
 
@@ -71,10 +72,10 @@ def get_crop_size(width, height):
 
 
 def get_padding_size(width, height):
-    top = (IMAGE_DIM - height) // 2
-    bottom = (IMAGE_DIM - height) // 2
-    left = (IMAGE_DIM - width) // 2
-    right = (IMAGE_DIM - width) // 2
+    top = int((IMAGE_DIM - height) / 2)
+    bottom = int((IMAGE_DIM - height) / 2)
+    left = int((IMAGE_DIM - width) / 2)
+    right = int((IMAGE_DIM - width) / 2)
     return top, bottom, left, right
 
 
@@ -106,21 +107,33 @@ def create_data_subset(image_list, destination_folder):
     images_folder = prefix_with_data_folder('Images')
     annotations_folder = prefix_with_data_folder('Annotation')
     ensure_existing_data_folder(destination_folder)
-    for image_path in image_list['file_list']:
-        path_str = image_path[0][0]
-        src = os.path.join(images_folder, path_str)
-        dst = os.path.join(prefix_with_data_folder(destination_folder), path_str)
-        class_folder = path_str.split('/')[0]
+    for image_path in image_list:
+        src = os.path.join(images_folder, image_path)
+        dst = os.path.join(prefix_with_data_folder(destination_folder), image_path)
+        class_folder = image_path.split('/')[0]
         ensure_existing_data_folder(os.path.join(destination_folder, class_folder))
-        annotation_str = path_str.split('.')[0]
+        annotation_str = image_path.split('.')[0]
         annotation_path = os.path.join(annotations_folder, annotation_str)
         cropped_img = modify_image_size(annotation_path, src)
         cv2.imwrite(dst, cv2.cvtColor(cropped_img, cv2.COLOR_BGR2RGB))
 
 
 def get_split_data_lists():
-    train_list = sio.loadmat(prefix_with_data_folder('Lists/train_list.mat'))
-    test_list = sio.loadmat(prefix_with_data_folder('Lists/test_list.mat'))
+    images_folder = prefix_with_data_folder('Images')
+    class_list = os.listdir(images_folder)
+    train_list = []
+    test_list = []
+
+    for class_path in class_list:
+        class_folder = os.path.join(images_folder, class_path)
+        class_images_list = os.listdir(class_folder)
+        random.seed(0)
+        random.shuffle(class_images_list)
+        class_images_list = [class_path + '/' + image_path for image_path in class_images_list]
+        split_number = int(round(0.8 * len(class_images_list)))
+        [train_list.append(image_path) for image_path in class_images_list[:split_number]]
+        [test_list.append(image_path) for image_path in class_images_list[split_number:]]
+
     return train_list, test_list
 
 
