@@ -61,26 +61,25 @@ def ensure_existing_data_folder(path):
         os.makedirs(folder_path)
 
 
-def get_crop_size(width, height, max_size):
+def get_crop_size(width, height):
     if width > height:
-        scale = max_size/width
+        scale = IMAGE_DIM/width
     else:
-        scale = max_size/height
+        scale = IMAGE_DIM/height
     new_width, new_height = width*scale, height*scale
     return new_width, new_height
 
 
-def get_padding_size(width, height, max_size):
-    top = int((max_size - height) / 2)
-    bottom = int((max_size - height) / 2)
-    left = int((max_size - width) / 2)
-    right = int((max_size - width) / 2)
+def get_padding_size(width, height):
+    top = (IMAGE_DIM - height) // 2
+    bottom = (IMAGE_DIM - height) // 2
+    left = (IMAGE_DIM - width) // 2
+    right = (IMAGE_DIM - width) // 2
     return top, bottom, left, right
 
 
 def modify_image_size(annotation_path, src):
     img = skimage.io.imread(src)
-    max_size = 400.
     dom = minidom.parse(annotation_path)
     object_tag = dom.getElementsByTagName('object')
     bndbox_tag = object_tag[0].getElementsByTagName('bndbox')
@@ -92,12 +91,12 @@ def modify_image_size(annotation_path, src):
 
     width = xmax - xmin
     height = ymax - ymin
-    if width > max_size or height > max_size:
-        width, height = get_crop_size(width, height, max_size)
+    if width > IMAGE_DIM or height > IMAGE_DIM:
+        width, height = get_crop_size(width, height)
         cropped_img = cv2.resize(cropped_img, (int(width), int(height)))
 
     border_type = cv2.BORDER_CONSTANT
-    top, bottom, left, right = get_padding_size(width, height, max_size)
+    top, bottom, left, right = get_padding_size(width, height)
     cropped_img = cv2.copyMakeBorder(cropped_img, top, bottom, left, right, border_type)
     return cropped_img
 
