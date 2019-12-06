@@ -142,10 +142,8 @@ def get_image_generators(config):
                                                                  horizontal_flip=True,
                                                                  rotation_range=30,
                                                                  shear_range=10,
-                                                                 width_shift_range=0.1,
-                                                                 height_shift_range=0.1,
-                                                                 zoom_range=0.1,
-                                                                 channel_shift_range=0.1
+                                                                 zoom_range=0.05,
+                                                                 channel_shift_range=0.02
                                                                  )
     train_generator = train_datagen.flow_from_directory(
         os.path.join(DATA_DIR, 'train'),
