@@ -43,8 +43,9 @@ Accuracy and loss are logged in tensorboard format to `/logs` directory, and bes
 We trained our models on google cloud platform using virtual machine with 2 CPUs, 13 GB RAM and NVIDIA Tesla P100.
 
 ## Training process
-We experimented with different hyperparameters and augmentation methods and ran ~10 training runs, below you can see v
-alidation accuracy progress during runs which increased accuracy:
+We experimented with different hyperparameters and augmentation methods and ran ~10 training runs (validation accuracy in graph):
+![Training_runs](./doc_images/all_training_runs.png)
+below you can see validation accuracy progress during runs which increased accuracy:
 ![Training_runs](./doc_images/training_runs.png)
 
 - Dark blue - baseline model ~16% accuracy
